@@ -340,16 +340,16 @@
   }
   function updateAllowedEntries() {
     let forbiddenEntries = [];
-    if (gridState.filter(t => t.row === 1).length === 4) forbiddenEntries = forbiddenEntries.concat([L1, R1]);
-    if (gridState.filter(t => t.row === 2).length === 4) forbiddenEntries = forbiddenEntries.concat([L2, R2]);
-    if (gridState.filter(t => t.row === 3).length === 4) forbiddenEntries = forbiddenEntries.concat([L3, R3]);
-    if (gridState.filter(t => t.row === 4).length === 4) forbiddenEntries = forbiddenEntries.concat([L4, R4]);
-    if (gridState.filter(t => t.col === 1).length === 4) forbiddenEntries = forbiddenEntries.concat([U1, D1]);
-    if (gridState.filter(t => t.col === 2).length === 4) forbiddenEntries = forbiddenEntries.concat([U2, D2]);
-    if (gridState.filter(t => t.col === 3).length === 4) forbiddenEntries = forbiddenEntries.concat([U3, D3]);
-    if (gridState.filter(t => t.col === 4).length === 4) forbiddenEntries = forbiddenEntries.concat([U4, D4]);
+    if (gridState.filter(function (t) { return t.row === 1 }).length === 4) forbiddenEntries = forbiddenEntries.concat([L1, R1]);
+    if (gridState.filter(function (t) { return t.row === 2 }).length === 4) forbiddenEntries = forbiddenEntries.concat([L2, R2]);
+    if (gridState.filter(function (t) { return t.row === 3 }).length === 4) forbiddenEntries = forbiddenEntries.concat([L3, R3]);
+    if (gridState.filter(function (t) { return t.row === 4 }).length === 4) forbiddenEntries = forbiddenEntries.concat([L4, R4]);
+    if (gridState.filter(function (t) { return t.col === 1 }).length === 4) forbiddenEntries = forbiddenEntries.concat([U1, D1]);
+    if (gridState.filter(function (t) { return t.col === 2 }).length === 4) forbiddenEntries = forbiddenEntries.concat([U2, D2]);
+    if (gridState.filter(function (t) { return t.col === 3 }).length === 4) forbiddenEntries = forbiddenEntries.concat([U3, D3]);
+    if (gridState.filter(function (t) { return t.col === 4 }).length === 4) forbiddenEntries = forbiddenEntries.concat([U4, D4]);
     allowedEntries = [];
-    gridState.forEach(c => {
+    gridState.forEach(function (c) {
       if (c.row === 1) {
         if (c.col === 1) allowedEntries.push(D1);
         if (c.col === 2) allowedEntries.push(D2);
@@ -374,7 +374,7 @@
         if (c.row === 3) allowedEntries.push(L3);
         if (c.row === 4) allowedEntries.push(L4);
       }
-      allowedEntries = allowedEntries.filter(e => forbiddenEntries.indexOf(e) === -1);
+      allowedEntries = allowedEntries.filter(function (e) { return forbiddenEntries.indexOf(e) === -1 });
 
 
       allEntries.forEach(function (e) {
@@ -442,7 +442,7 @@
       });
       const tileIdxToMove = [];
       let pushingTileIndex = 0;
-      alignedTiles.forEach(t => {
+      alignedTiles.forEach(function (t) {
         if ((move === "D" && t.row - 1 === pushingTileIndex) || (move === "U" && (5 - t.row - 1) === pushingTileIndex) || (move === "R" && t.col - 1 === pushingTileIndex) || (move === "L" && (5 - t.col - 1) === pushingTileIndex)) {
           tileIdxToMove.push(t.idx);
           pushingTileIndex++;
@@ -514,27 +514,27 @@
     let isGreenWinner = false;
     let isBlueWinner = false;
 
-    if (gridState.filter(t => t.row === 1 && t.player === "green").length === 4) isGreenWinner = true;
-    if (gridState.filter(t => t.row === 2 && t.player === "green").length === 4) isGreenWinner = true;
-    if (gridState.filter(t => t.row === 3 && t.player === "green").length === 4) isGreenWinner = true;
-    if (gridState.filter(t => t.row === 4 && t.player === "green").length === 4) isGreenWinner = true;
-    if (gridState.filter(t => t.col === 1 && t.player === "green").length === 4) isGreenWinner = true;
-    if (gridState.filter(t => t.col === 2 && t.player === "green").length === 4) isGreenWinner = true;
-    if (gridState.filter(t => t.col === 3 && t.player === "green").length === 4) isGreenWinner = true;
-    if (gridState.filter(t => t.col === 4 && t.player === "green").length === 4) isGreenWinner = true;
-    if (gridState.filter(t => t.col === t.row && t.player === "green").length === 4) isGreenWinner = true;
-    if (gridState.filter(t => t.col === 5 - t.row && t.player === "green").length === 4) isGreenWinner = true;
+    if (gridState.filter(function (t) { return t.row === 1 && t.player === "green" }).length === 4) isGreenWinner = true;
+    if (gridState.filter(function (t) { return t.row === 2 && t.player === "green" }).length === 4) isGreenWinner = true;
+    if (gridState.filter(function (t) { return t.row === 3 && t.player === "green" }).length === 4) isGreenWinner = true;
+    if (gridState.filter(function (t) { return t.row === 4 && t.player === "green" }).length === 4) isGreenWinner = true;
+    if (gridState.filter(function (t) { return t.col === 1 && t.player === "green" }).length === 4) isGreenWinner = true;
+    if (gridState.filter(function (t) { return t.col === 2 && t.player === "green" }).length === 4) isGreenWinner = true;
+    if (gridState.filter(function (t) { return t.col === 3 && t.player === "green" }).length === 4) isGreenWinner = true;
+    if (gridState.filter(function (t) { return t.col === 4 && t.player === "green" }).length === 4) isGreenWinner = true;
+    if (gridState.filter(function (t) { return t.col === t.row && t.player === "green" }).length === 4) isGreenWinner = true;
+    if (gridState.filter(function (t) { return t.col === 5 - t.row && t.player === "green" }).length === 4) isGreenWinner = true;
 
-    if (gridState.filter(t => t.row === 1 && t.player === "blue").length === 4) isBlueWinner = true;
-    if (gridState.filter(t => t.row === 2 && t.player === "blue").length === 4) isBlueWinner = true;
-    if (gridState.filter(t => t.row === 3 && t.player === "blue").length === 4) isBlueWinner = true;
-    if (gridState.filter(t => t.row === 4 && t.player === "blue").length === 4) isBlueWinner = true;
-    if (gridState.filter(t => t.col === 1 && t.player === "blue").length === 4) isBlueWinner = true;
-    if (gridState.filter(t => t.col === 2 && t.player === "blue").length === 4) isBlueWinner = true;
-    if (gridState.filter(t => t.col === 3 && t.player === "blue").length === 4) isBlueWinner = true;
-    if (gridState.filter(t => t.col === 4 && t.player === "blue").length === 4) isBlueWinner = true;
-    if (gridState.filter(t => t.col === t.row && t.player === "blue").length === 4) isBlueWinner = true;
-    if (gridState.filter(t => t.col === 5 - t.row && t.player === "blue").length === 4) isBlueWinner = true;
+    if (gridState.filter(function (t) { return t.row === 1 && t.player === "blue" }).length === 4) isBlueWinner = true;
+    if (gridState.filter(function (t) { return t.row === 2 && t.player === "blue" }).length === 4) isBlueWinner = true;
+    if (gridState.filter(function (t) { return t.row === 3 && t.player === "blue" }).length === 4) isBlueWinner = true;
+    if (gridState.filter(function (t) { return t.row === 4 && t.player === "blue" }).length === 4) isBlueWinner = true;
+    if (gridState.filter(function (t) { return t.col === 1 && t.player === "blue" }).length === 4) isBlueWinner = true;
+    if (gridState.filter(function (t) { return t.col === 2 && t.player === "blue" }).length === 4) isBlueWinner = true;
+    if (gridState.filter(function (t) { return t.col === 3 && t.player === "blue" }).length === 4) isBlueWinner = true;
+    if (gridState.filter(function (t) { return t.col === 4 && t.player === "blue" }).length === 4) isBlueWinner = true;
+    if (gridState.filter(function (t) { return t.col === t.row && t.player === "blue" }).length === 4) isBlueWinner = true;
+    if (gridState.filter(function (t) { return t.col === 5 - t.row && t.player === "blue" }).length === 4) isBlueWinner = true;
 
     if (isBlueWinner && isGreenWinner) {
       resultNode.innerText = "Égalité !";
