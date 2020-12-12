@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    .grid {
+      background-color: grey;
+      border-radius: 5px;
+      width: 425px;
+      display: flex;
+      flex-wrap: wrap;
+      padding: 2.5px;
+    }
+
+    .tile {
+      background-color: white;
+      border-radius: 5px;
+      width: 100px;
+      height: 100px;
+      margin: 2.5px;
+    }
+
+    .board {
+      width: 645px;
+      height: 645px;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .tile-row {
+      padding: 2.5px 7.5px;
+      display: flex;
+    }
+
+    .tile-col {
+      padding: 2.5px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .entry-tile {
+      background-color: lightgrey;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .inactive {
+      opacity: 0.4;
+      cursor: auto;
+    }
+
+    [class*="arrow"] {
+      /* https://codepen.io/saeedalipoor/pen/NPyeog */
+      position: relative;
+      display: inline-block;
+      vertical-align: middle;
+      color: #666;
+      box-sizing: border-box;
+      width: 0;
+      height: 0;
+      border-width: 6px;
+      border-style: solid;
+      border-bottom-color: transparent;
+      border-left-color: transparent;
+      margin: 10px;
+    }
+
+    [class*="arrow"]:after {
+      content: "";
+      box-sizing: border-box;
+    }
+
+    [class*="arrow"]:before {
+      content: "";
+      box-sizing: border-box;
+      right: 0;
+      top: -3px;
+      position: absolute;
+      height: 4px;
+      box-shadow: inset 0 0 0 32px;
+      transform: rotate(-45deg);
+      width: 15px;
+      transform-origin: right top;
+    }
+
+    [class*="-left"] {
+      transform: rotate(-135deg);
+    }
+
+    [class*="-right"] {
+      transform: rotate(45deg);
+    }
+
+    [class*="-up"] {
+      transform: rotate(-45deg);
+    }
+
+    [class*="-down"] {
+      transform: rotate(135deg);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="board">
+    <div class="tile-row">
+      <div class="tile"></div>
+      <div id="D1" class="entry-tile tile inactive">
+        <div class="arrow-down"></div>
+      </div>
+      <div id="D2" class="entry-tile tile">
+        <div class="arrow-down"></div>
+      </div>
+      <div id="D3" class="entry-tile tile">
+        <div class="arrow-down"></div>
+      </div>
+      <div id="D4" class="entry-tile tile">
+        <div class="arrow-down"></div>
+      </div>
+      <div class="tile"></div>
+    </div>
+    <div class="tile-col">
+      <div id="R1" class="entry-tile tile">
+        <div class="arrow-right"></div>
+      </div>
+      <div id="R2" class="entry-tile tile">
+        <div class="arrow-right"></div>
+      </div>
+      <div id="R3" class="entry-tile tile">
+        <div class="arrow-right"></div>
+      </div>
+      <div id="R4" class="entry-tile tile">
+        <div class="arrow-right"></div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+    </div>
+    <div class="tile-col">
+      <div id="L1" class="entry-tile tile">
+        <div class="arrow-left"></div>
+      </div>
+      <div id="L2" class="entry-tile tile">
+        <div class="arrow-left"></div>
+      </div>
+      <div id="L3" class="entry-tile tile">
+        <div class="arrow-left"></div>
+      </div>
+      <div id="L4" class="entry-tile tile">
+        <div class="arrow-left"></div>
+      </div>
+    </div>
+    <div class="tile-row">
+      <div class="tile"></div>
+      <div id="U1" class="entry-tile tile">
+        <div class="arrow-up"></div>
+      </div>
+      <div id="U2" class="entry-tile tile">
+        <div class="arrow-up"></div>
+      </div>
+      <div id="U3" class="entry-tile tile">
+        <div class="arrow-up"></div>
+      </div>
+      <div id="U4" class="entry-tile tile">
+        <div class="arrow-up"></div>
+      </div>
+      <div class="tile"></div>
+    </div>
+  </div>
+</body>
+
+<script>
+  let state = [];
+  let allowedEntries = [];
+  let currentPlayer = "green";
+
+  function playEntry(event) {
+    // check entry is authorized
+    if (allowedEntries.indexOf(event.target)) {
+      console.log("ok");
+    }
+    console.log("ko");
+  }
+
+  function setup() {
+    const entries = document.getElementsByClassName("entry-tile");
+    for (let i = 0; i < entries.length; i++) {
+      entries[i].addEventListener("click", playEntry);
+    }
+  };
+
+  const D1 = document.getElementById("D1");
+  const D2 = document.getElementById("D2");
+  const D3 = document.getElementById("D3");
+  const D4 = document.getElementById("D4");
+  const L1 = document.getElementById("L1");
+  const L2 = document.getElementById("L2");
+  const L3 = document.getElementById("L3");
+  const L4 = document.getElementById("L4");
+  const U1 = document.getElementById("U1");
+  const U2 = document.getElementById("U2");
+  const U3 = document.getElementById("U3");
+  const U4 = document.getElementById("U4");
+  const R1 = document.getElementById("R1");
+  const R2 = document.getElementById("R2");
+  const R3 = document.getElementById("R3");
+  const R4 = document.getElementById("R4");
+
+  const allEntries = [D1, D2, D3, D4, L1, L2, L3, L4, U1, U2, U3, U4, R1, R2, R3, R4];
+
+  function initGame() {
+    state = [{
+      player: "blue",
+      row: 4,
+      col: 1
+    }];
+  }
+  function getAllowedEntries() {
+    allowedEntries = [];
+    state.forEach(c => {
+      if (c.row === 1) {
+        switch (c.col) {
+          case 1:
+            allowedEntries.push(D1);
+            break;
+          case 2:
+            allowedEntries.push(D2);
+            break;
+          case 3:
+            allowedEntries.push(D3);
+            break;
+          case 4:
+            allowedEntries.push(D4);
+            break;
+        }
+      }
+      if (c.row === 4) {
+        switch (c.col) {
+          case 1:
+            allowedEntries.push(U1);
+            break;
+          case 2:
+            allowedEntries.push(U2);
+            break;
+          case 3:
+            allowedEntries.push(U3);
+            break;
+          case 4:
+            allowedEntries.push(U4);
+            break;
+        }
+      }
+      if (c.col === 1) {
+        switch (c.row) {
+          case 1:
+            allowedEntries.push(R1);
+            break;
+          case 2:
+            allowedEntries.push(R2);
+            break;
+          case 3:
+            allowedEntries.push(R3);
+            break;
+          case 4:
+            allowedEntries.push(R4);
+            break;
+        }
+      }
+      if (c.col === 4) {
+        switch (c.row) {
+          case 1:
+            allowedEntries.push(L1);
+            break;
+          case 2:
+            allowedEntries.push(L2);
+            break;
+          case 3:
+            allowedEntries.push(L3);
+            break;
+          case 4:
+            allowedEntries.push(L4);
+            break;
+        }
+      }
+
+      allEntries.forEach(function (e) {
+        if (allowedEntries.indexOf(e) === -1) {
+          e.classList.add('inactive');
+        } else {
+          e.classList.remove('inactive');
+          e.addEventListener("mouseover", function () {
+            e.style.backgroundColor = currentPlayer === "blue" ? "rgb(44, 83, 132)" : "rgb(0,171,169)";
+          });
+          e.addEventListener("mouseleave", function () {
+            e.style = '';
+          });
+        }
+      });
+    });
+  }
+
+  setup();
+  initGame();
+  getAllowedEntries();
+</script>
+
+</html>
