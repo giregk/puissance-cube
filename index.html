@@ -24,14 +24,6 @@
       margin: 2.5px;
     }
 
-    .green {
-      background-color: rgb(0, 171, 169);
-    }
-
-    .blue {
-      background-color: rgb(44, 83, 132);
-    }
-
     #board {
       width: 645px;
       height: 645px;
@@ -56,28 +48,42 @@
     }
 
     .entry-tile {
-      background-color: lightgrey;
+      background-color: white;
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+
+    .active {
       cursor: pointer;
     }
 
-    .inactive {
-      opacity: 0.4;
-      cursor: auto;
+    .tile.green {
+      background-color: rgb(0, 171, 169);
     }
 
-    .inactive [class*="arrow"] {
-      display: none;
+    .tile.active.green:hover {
+      background-color: rgb(0, 111, 109);
+    }
+
+    .tile.blue {
+      background-color: rgb(44, 83, 132);
+    }
+
+    .tile.active.blue:hover {
+      background-color: rgb(4, 43, 92);
+    }
+
+    .active [class*="arrow"] {
+      display: inline-block;
     }
 
     [class*="arrow"] {
       /* https://codepen.io/saeedalipoor/pen/NPyeog */
       position: relative;
-      display: inline-block;
+      display: none;
       vertical-align: middle;
-      color: gray;
+      color: white;
       box-sizing: border-box;
       width: 0;
       height: 0;
@@ -208,9 +214,11 @@
     <div id="game-tiles">
     </div>
   </div>
+  <div id="result"></div>
 </body>
 
 <script>
+  const ANIMATION_DURATION = 300;
   const board = document.getElementById("board");
   const gameTilesContainer = document.getElementById("game-tiles");
   const gridTiles = document.querySelectorAll("#grid .tile");
@@ -233,6 +241,7 @@
   const R4 = document.getElementById("R4");
 
   const allEntries = [D1, D2, D3, D4, L1, L2, L3, L4, U1, U2, U3, U4, R1, R2, R3, R4];
+  const resultNode = document.getElementById("result");
 
   let gridState = [];
   let allowedEntries = [];
@@ -249,6 +258,8 @@
 
   function initGame() {
     currentPlayer = "green";
+    resultNode.style.color = "inherit";
+    resultNode.innerText = "";
     gameTileNodes = [];
     while (gameTilesContainer.firstChild) {
       gameTilesContainer.removeChild(gameTilesContainer.firstChild);
@@ -304,15 +315,12 @@
 
       allEntries.forEach(function (e) {
         if (allowedEntries.indexOf(e) === -1) {
-          e.classList.add('inactive');
+          e.classList.remove('active');
+          e.classList.remove('green');
+          e.classList.remove('blue');
         } else {
-          e.classList.remove('inactive');
-          e.addEventListener("mouseover", function () {
-            e.style.backgroundColor = currentPlayer === "blue" ? "rgb(44, 83, 132)" : "rgb(0,171,169)";
-          });
-          e.addEventListener("mouseleave", function () {
-            e.style = '';
-          });
+          e.classList.add('active');
+          e.classList.add(currentPlayer);
         }
       });
     });
@@ -346,6 +354,11 @@
   function playEntry(event) {
     // check if entry is authorized
     if (allowedEntries.indexOf(event.target) !== -1) {
+      allEntries.forEach(function (e) {
+        e.classList.remove('active');
+        e.classList.remove('green');
+        e.classList.remove('blue');
+      });
       addUITile(event.target, currentPlayer);
       const id = event.target.getAttribute("id");
       const move = id[0];
@@ -396,12 +409,17 @@
       });
 
       currentPlayer = currentPlayer === "blue" ? 'green' : "blue";
-      updateAllowedEntries();
+      if (!isEndOfGame()) {
+        setTimeout(
+          updateAllowedEntries,
+          ANIMATION_DURATION
+        )
+      }
     }
   }
 
   function animateTile(tileToMove, destTile) {
-    const totalIterations = 30;
+    const totalIterations = ANIMATION_DURATION / 10;
     const destPos = getTilePosition(destTile);
     let currentTop = parseInt(tileToMove.style.top.replace("px", ""));
     let currentLeft = parseInt(tileToMove.style.left.replace("px", ""));
@@ -420,6 +438,54 @@
         iteration++;
       }
     }
+  }
+
+  function isEndOfGame() {
+    let isGreenWinner = false;
+    let isBlueWinner = false;
+
+    if (gridState.filter(t => t.row === 1 && t.player === "green").length === 4) isGreenWinner = true;
+    if (gridState.filter(t => t.row === 2 && t.player === "green").length === 4) isGreenWinner = true;
+    if (gridState.filter(t => t.row === 3 && t.player === "green").length === 4) isGreenWinner = true;
+    if (gridState.filter(t => t.row === 4 && t.player === "green").length === 4) isGreenWinner = true;
+    if (gridState.filter(t => t.col === 1 && t.player === "green").length === 4) isGreenWinner = true;
+    if (gridState.filter(t => t.col === 2 && t.player === "green").length === 4) isGreenWinner = true;
+    if (gridState.filter(t => t.col === 3 && t.player === "green").length === 4) isGreenWinner = true;
+    if (gridState.filter(t => t.col === 4 && t.player === "green").length === 4) isGreenWinner = true;
+    if (gridState.filter(t => t.col === t.row && t.player === "green").length === 4) isGreenWinner = true;
+    if (gridState.filter(t => t.col === 5 - t.row && t.player === "green").length === 4) isGreenWinner = true;
+
+    if (gridState.filter(t => t.row === 1 && t.player === "blue").length === 4) isBlueWinner = true;
+    if (gridState.filter(t => t.row === 2 && t.player === "blue").length === 4) isBlueWinner = true;
+    if (gridState.filter(t => t.row === 3 && t.player === "blue").length === 4) isBlueWinner = true;
+    if (gridState.filter(t => t.row === 4 && t.player === "blue").length === 4) isBlueWinner = true;
+    if (gridState.filter(t => t.col === 1 && t.player === "blue").length === 4) isBlueWinner = true;
+    if (gridState.filter(t => t.col === 2 && t.player === "blue").length === 4) isBlueWinner = true;
+    if (gridState.filter(t => t.col === 3 && t.player === "blue").length === 4) isBlueWinner = true;
+    if (gridState.filter(t => t.col === 4 && t.player === "blue").length === 4) isBlueWinner = true;
+    if (gridState.filter(t => t.col === t.row && t.player === "blue").length === 4) isBlueWinner = true;
+    if (gridState.filter(t => t.col === 5 - t.row && t.player === "blue").length === 4) isBlueWinner = true;
+
+    if (isBlueWinner && isGreenWinner) {
+      resultNode.innerText = "Égalité !";
+      return true;
+    }
+    if (isGreenWinner) {
+      resultNode.innerText = "Vert remporte la partie !";
+      resultNode.style.color = "rgb(0,171,169)";
+      return true;
+    }
+    if (isBlueWinner) {
+      resultNode.innerText = "Bleu remporte la partie !";
+      resultNode.style.color = "rgb(44, 83, 132)";
+      return true;
+    }
+
+    if (gridState.length === 16) {
+      resultNode.innerText = "Égalité !";
+      return true;
+    }
+    return false;
   }
 
   setupEntryTileListeners();
