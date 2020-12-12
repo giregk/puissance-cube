@@ -264,72 +264,43 @@
     updateAllowedEntries();
   }
   function updateAllowedEntries() {
+    let forbiddenEntries = [];
+    if (gridState.filter(t => t.row === 1).length === 4) forbiddenEntries = forbiddenEntries.concat([L1, R1]);
+    if (gridState.filter(t => t.row === 2).length === 4) forbiddenEntries = forbiddenEntries.concat([L2, R2]);
+    if (gridState.filter(t => t.row === 3).length === 4) forbiddenEntries = forbiddenEntries.concat([L3, R3]);
+    if (gridState.filter(t => t.row === 4).length === 4) forbiddenEntries = forbiddenEntries.concat([L4, R4]);
+    if (gridState.filter(t => t.col === 1).length === 4) forbiddenEntries = forbiddenEntries.concat([U1, D1]);
+    if (gridState.filter(t => t.col === 2).length === 4) forbiddenEntries = forbiddenEntries.concat([U2, D2]);
+    if (gridState.filter(t => t.col === 3).length === 4) forbiddenEntries = forbiddenEntries.concat([U3, D3]);
+    if (gridState.filter(t => t.col === 4).length === 4) forbiddenEntries = forbiddenEntries.concat([U4, D4]);
     allowedEntries = [];
     gridState.forEach(c => {
       if (c.row === 1) {
-        switch (c.col) {
-          case 1:
-            allowedEntries.push(D1);
-            break;
-          case 2:
-            allowedEntries.push(D2);
-            break;
-          case 3:
-            allowedEntries.push(D3);
-            break;
-          case 4:
-            allowedEntries.push(D4);
-            break;
-        }
+        if (c.col === 1) allowedEntries.push(D1);
+        if (c.col === 2) allowedEntries.push(D2);
+        if (c.col === 3) allowedEntries.push(D3);
+        if (c.col === 4) allowedEntries.push(D4);
       }
       if (c.row === 4) {
-        switch (c.col) {
-          case 1:
-            allowedEntries.push(U1);
-            break;
-          case 2:
-            allowedEntries.push(U2);
-            break;
-          case 3:
-            allowedEntries.push(U3);
-            break;
-          case 4:
-            allowedEntries.push(U4);
-            break;
-        }
+        if (c.col === 1) allowedEntries.push(U1);
+        if (c.col === 2) allowedEntries.push(U2);
+        if (c.col === 3) allowedEntries.push(U3);
+        if (c.col === 4) allowedEntries.push(U4);
       }
       if (c.col === 1) {
-        switch (c.row) {
-          case 1:
-            allowedEntries.push(R1);
-            break;
-          case 2:
-            allowedEntries.push(R2);
-            break;
-          case 3:
-            allowedEntries.push(R3);
-            break;
-          case 4:
-            allowedEntries.push(R4);
-            break;
-        }
+        if (c.row === 1) allowedEntries.push(R1);
+        if (c.row === 2) allowedEntries.push(R2);
+        if (c.row === 3) allowedEntries.push(R3);
+        if (c.row === 4) allowedEntries.push(R4);
       }
       if (c.col === 4) {
-        switch (c.row) {
-          case 1:
-            allowedEntries.push(L1);
-            break;
-          case 2:
-            allowedEntries.push(L2);
-            break;
-          case 3:
-            allowedEntries.push(L3);
-            break;
-          case 4:
-            allowedEntries.push(L4);
-            break;
-        }
+        if (c.row === 1) allowedEntries.push(L1);
+        if (c.row === 2) allowedEntries.push(L2);
+        if (c.row === 3) allowedEntries.push(L3);
+        if (c.row === 4) allowedEntries.push(L4);
       }
+      allowedEntries = allowedEntries.filter(e => forbiddenEntries.indexOf(e) === -1);
+
 
       allEntries.forEach(function (e) {
         if (allowedEntries.indexOf(e) === -1) {
@@ -430,7 +401,7 @@
   }
 
   function animateTile(tileToMove, destTile) {
-    const totalIterations = 50;
+    const totalIterations = 30;
     const destPos = getTilePosition(destTile);
     let currentTop = parseInt(tileToMove.style.top.replace("px", ""));
     let currentLeft = parseInt(tileToMove.style.left.replace("px", ""));
