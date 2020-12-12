@@ -415,7 +415,10 @@
     gameTileNodes.push(newTile);
   }
 
+  let lock = false;
   function playEntry(event) {
+    if (lock) return;
+    lock = true;
     // check if entry is authorized
     if (allowedEntries.indexOf(event.target) !== -1) {
       allEntries.forEach(function (e) {
@@ -475,7 +478,10 @@
       currentPlayer = currentPlayer === "blue" ? 'green' : "blue";
       if (!isEndOfGame()) {
         setTimeout(
-          updateAllowedEntries,
+          function () {
+            updateAllowedEntries();
+            lock = false;
+          },
           ANIMATION_DURATION
         )
       }
