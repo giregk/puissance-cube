@@ -376,7 +376,6 @@
       }
       allowedEntries = allowedEntries.filter(function (e) { return forbiddenEntries.indexOf(e) === -1 });
 
-
       allEntries.forEach(function (e) {
         if (allowedEntries.indexOf(e) === -1) {
           e.classList.remove('active');
@@ -415,75 +414,73 @@
     gameTileNodes.push(newTile);
   }
 
-  let lock = false;
   function playEntry(event) {
-    if (lock) return;
-    lock = true;
-    // check if entry is authorized
-    if (allowedEntries.indexOf(event.target) !== -1) {
-      allEntries.forEach(function (e) {
-        e.classList.remove('active');
-        e.classList.remove('green');
-        e.classList.remove('blue');
-      });
-      addUITile(event.target, currentPlayer);
-      const id = event.target.getAttribute("id");
-      const move = id[0];
-      const movIndex = parseInt(id[1]);
-      const alignedTiles = gridState.filter((t) => {
-        // keep only tiles that are aligned with the move
-        return ((move === "D" || move === "U") && movIndex === t.col) || ((move === "L" || move === "R") && movIndex === t.row)
-      }).sort((t1, t2) => {
-        // order tiles
-        if (move === "D") return t1.row < t2.row ? -1 : 1;
-        if (move === "U") return t1.row < t2.row ? 1 : -1;
-        if (move === "R") return t1.col < t2.col ? -1 : 1;
-        if (move === "L") return t1.col < t2.col ? 1 : -1;
-      });
-      const tileIdxToMove = [];
-      let pushingTileIndex = 0;
-      alignedTiles.forEach(function (t) {
-        if ((move === "D" && t.row - 1 === pushingTileIndex) || (move === "U" && (5 - t.row - 1) === pushingTileIndex) || (move === "R" && t.col - 1 === pushingTileIndex) || (move === "L" && (5 - t.col - 1) === pushingTileIndex)) {
-          tileIdxToMove.push(t.idx);
-          pushingTileIndex++;
+    console.log(event.detail);
+    // prevent double clicks
+    if (!event.detail || event.detail === 1) {
+      // check if entry is authorized
+      if (allowedEntries.indexOf(event.target) !== -1) {
+        allEntries.forEach(function (e) {
+          e.classList.remove('active');
+          e.classList.remove('green');
+          e.classList.remove('blue');
+        });
+        addUITile(event.target, currentPlayer);
+        const id = event.target.getAttribute("id");
+        const move = id[0];
+        const moveIndex = parseInt(id[1]);
+        const alignedTiles = gridState.filter(function (t) {
+          // keep only tiles that are aligned with the move
+          return ((move === "D" || move === "U") && moveIndex === t.col) || ((move === "L" || move === "R") && moveIndex === t.row)
+        }).sort(function (t1, t2) {
+          // order tiles
+          if (move === "D") return t1.row < t2.row ? -1 : 1;
+          if (move === "U") return t1.row < t2.row ? 1 : -1;
+          if (move === "R") return t1.col < t2.col ? -1 : 1;
+          if (move === "L") return t1.col < t2.col ? 1 : -1;
+        });
+        const tileIdxToMove = [];
+        let pushingTileIndex = 0;
+        alignedTiles.forEach(function (t) {
+          if ((move === "D" && t.row - 1 === pushingTileIndex) || (move === "U" && (5 - t.row - 1) === pushingTileIndex) || (move === "R" && t.col - 1 === pushingTileIndex) || (move === "L" && (5 - t.col - 1) === pushingTileIndex)) {
+            tileIdxToMove.push(t.idx);
+            pushingTileIndex++;
+          }
+        });
+
+        // update tile positions
+        gridState = gridState.map(function (t) {
+          if (tileIdxToMove.indexOf(t.idx) !== -1) {
+            if (move === "D") return { idx: t.idx, col: t.col, player: t.player, row: t.row + 1 };
+            if (move === "U") return { idx: t.idx, col: t.col, player: t.player, row: t.row - 1 };
+            if (move === "L") return { idx: t.idx, row: t.row, player: t.player, col: t.col - 1 };
+            if (move === "R") return { idx: t.idx, row: t.row, player: t.player, col: t.col + 1 };
+          }
+          return t;
+        });
+
+        newTile = {
+          idx: gridState.length,
+          player: currentPlayer,
+          row: (move === "L" || move == "R") ? moveIndex : move === "D" ? 1 : 4,
+          col: (move === "D" || move == "U") ? moveIndex : move === "R" ? 1 : 4
+        };
+        gridState.push(newTile);
+
+        // animate tiles
+        tileIdxToMove.push(newTile.idx);
+
+        gridState.filter(function (t) { return tileIdxToMove.indexOf(t.idx) !== -1 }).forEach(function (t) {
+          animateTile(gameTileNodes[t.idx], getGridTileFor(t.row, t.col));
+        });
+
+        currentPlayer = currentPlayer === "blue" ? 'green' : "blue";
+        if (!isEndOfGame()) {
+          setTimeout(
+            updateAllowedEntries,
+            ANIMATION_DURATION
+          )
         }
-      });
-
-      // update tile positions
-      gridState = gridState.map(t => {
-        if (tileIdxToMove.indexOf(t.idx) !== -1) {
-          if (move === "D") return { ...t, row: t.row + 1 };
-          if (move === "U") return { ...t, row: t.row - 1 };
-          if (move === "L") return { ...t, col: t.col - 1 };
-          if (move === "R") return { ...t, col: t.col + 1 };
-        }
-        return t;
-      });
-
-      newTile = {
-        idx: gridState.length,
-        player: currentPlayer,
-        row: (move === "L" || move == "R") ? movIndex : move === "D" ? 1 : 4,
-        col: (move === "D" || move == "U") ? movIndex : move === "R" ? 1 : 4
-      };
-      gridState.push(newTile);
-
-      // animate tiles
-      tileIdxToMove.push(newTile.idx);
-
-      gridState.filter(t => tileIdxToMove.indexOf(t.idx) !== -1).forEach(t => {
-        animateTile(gameTileNodes[t.idx], getGridTileFor(t.row, t.col));
-      });
-
-      currentPlayer = currentPlayer === "blue" ? 'green' : "blue";
-      if (!isEndOfGame()) {
-        setTimeout(
-          function () {
-            updateAllowedEntries();
-            lock = false;
-          },
-          ANIMATION_DURATION
-        )
       }
     }
   }
