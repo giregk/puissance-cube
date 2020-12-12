@@ -7,7 +7,7 @@
       box-sizing: border-box;
     }
 
-    .grid {
+    #grid {
       background-color: grey;
       border-radius: 5px;
       width: 425px;
@@ -24,11 +24,24 @@
       margin: 2.5px;
     }
 
-    .board {
+    .green {
+      background-color: rgb(0, 171, 169);
+    }
+
+    .blue {
+      background-color: rgb(44, 83, 132);
+    }
+
+    #board {
       width: 645px;
       height: 645px;
       display: flex;
       flex-wrap: wrap;
+      position: relative;
+    }
+
+    #game-tiles {
+      position: absolute;
     }
 
     .tile-row {
@@ -55,12 +68,16 @@
       cursor: auto;
     }
 
+    .inactive [class*="arrow"] {
+      display: none;
+    }
+
     [class*="arrow"] {
       /* https://codepen.io/saeedalipoor/pen/NPyeog */
       position: relative;
       display: inline-block;
       vertical-align: middle;
-      color: #666;
+      color: gray;
       box-sizing: border-box;
       width: 0;
       height: 0;
@@ -109,10 +126,10 @@
 
 <body>
 
-  <div class="board">
+  <div id="board">
     <div class="tile-row">
       <div class="tile"></div>
-      <div id="D1" class="entry-tile tile inactive">
+      <div id="D1" class="entry-tile tile">
         <div class="arrow-down"></div>
       </div>
       <div id="D2" class="entry-tile tile">
@@ -140,7 +157,7 @@
         <div class="arrow-right"></div>
       </div>
     </div>
-    <div class="grid">
+    <div id="grid">
       <div class="tile"></div>
       <div class="tile"></div>
       <div class="tile"></div>
@@ -188,28 +205,15 @@
       </div>
       <div class="tile"></div>
     </div>
+    <div id="game-tiles">
+    </div>
   </div>
 </body>
 
 <script>
-  let state = [];
-  let allowedEntries = [];
-  let currentPlayer = "green";
-
-  function playEntry(event) {
-    // check entry is authorized
-    if (allowedEntries.indexOf(event.target)) {
-      console.log("ok");
-    }
-    console.log("ko");
-  }
-
-  function setup() {
-    const entries = document.getElementsByClassName("entry-tile");
-    for (let i = 0; i < entries.length; i++) {
-      entries[i].addEventListener("click", playEntry);
-    }
-  };
+  const board = document.getElementById("board");
+  const gameTilesContainer = document.getElementById("game-tiles");
+  const gridTiles = document.querySelectorAll("#grid .tile");
 
   const D1 = document.getElementById("D1");
   const D2 = document.getElementById("D2");
@@ -230,16 +234,38 @@
 
   const allEntries = [D1, D2, D3, D4, L1, L2, L3, L4, U1, U2, U3, U4, R1, R2, R3, R4];
 
+  let gridState = [];
+  let allowedEntries = [];
+  let currentPlayer = "green";
+  let gameTileNodes = [];
+
+
+  function setupEntryTileListeners() {
+    const entries = document.getElementsByClassName("entry-tile");
+    for (let i = 0; i < entries.length; i++) {
+      entries[i].addEventListener("click", playEntry);
+    }
+  };
+
   function initGame() {
-    state = [{
+    currentPlayer = "green";
+    gameTileNodes = [];
+    while (gameTilesContainer.firstChild) {
+      gameTilesContainer.removeChild(gameTilesContainer.firstChild);
+    }
+    const firstTile = {
+      idx: 0,
       player: "blue",
       row: 4,
       col: 1
-    }];
+    };
+    gridState = [firstTile];
+    addUITile(getGridTileFor(firstTile.row, firstTile.col), firstTile.player);
+    updateAllowedEntries();
   }
-  function getAllowedEntries() {
+  function updateAllowedEntries() {
     allowedEntries = [];
-    state.forEach(c => {
+    gridState.forEach(c => {
       if (c.row === 1) {
         switch (c.col) {
           case 1:
@@ -321,9 +347,112 @@
     });
   }
 
-  setup();
+  function getGridTileFor(row, col) {
+    return gridTiles[4 * (row - 1) + col - 1];
+  }
+
+  function getTilePosition(tile) {
+    const tileAbsPos = tile.getBoundingClientRect();
+    const boardAbsPos = board.getBoundingClientRect();
+    return {
+      top: tileAbsPos.top - boardAbsPos.top,
+      left: tileAbsPos.left - boardAbsPos.left,
+    }
+  }
+
+  function addUITile(targetTile, player) {
+    const newTile = document.createElement("div");
+    newTile.classList.add("tile");
+    newTile.classList.add(player);
+    newTile.style.position = "absolute";
+    const pos = getTilePosition(targetTile);
+    newTile.style.top = pos.top - 2.5 + 'px';
+    newTile.style.left = pos.left - 2.5 + 'px';
+    gameTilesContainer.appendChild(newTile);
+    gameTileNodes.push(newTile);
+  }
+
+  function playEntry(event) {
+    // check if entry is authorized
+    if (allowedEntries.indexOf(event.target) !== -1) {
+      addUITile(event.target, currentPlayer);
+      const id = event.target.getAttribute("id");
+      const move = id[0];
+      const movIndex = parseInt(id[1]);
+      const alignedTiles = gridState.filter((t) => {
+        // keep only tiles that are aligned with the move
+        return ((move === "D" || move === "U") && movIndex === t.col) || ((move === "L" || move === "R") && movIndex === t.row)
+      }).sort((t1, t2) => {
+        // order tiles
+        if (move === "D") return t1.row < t2.row ? -1 : 1;
+        if (move === "U") return t1.row < t2.row ? 1 : -1;
+        if (move === "R") return t1.col < t2.col ? -1 : 1;
+        if (move === "L") return t1.col < t2.col ? 1 : -1;
+      });
+      const tileIdxToMove = [];
+      let pushingTileIndex = 0;
+      alignedTiles.forEach(t => {
+        if ((move === "D" && t.row - 1 === pushingTileIndex) || (move === "U" && (5 - t.row - 1) === pushingTileIndex) || (move === "R" && t.col - 1 === pushingTileIndex) || (move === "L" && (5 - t.col - 1) === pushingTileIndex)) {
+          tileIdxToMove.push(t.idx);
+          pushingTileIndex++;
+        }
+      });
+
+      // update tile positions
+      gridState = gridState.map(t => {
+        if (tileIdxToMove.indexOf(t.idx) !== -1) {
+          if (move === "D") return { ...t, row: t.row + 1 };
+          if (move === "U") return { ...t, row: t.row - 1 };
+          if (move === "L") return { ...t, col: t.col - 1 };
+          if (move === "R") return { ...t, col: t.col + 1 };
+        }
+        return t;
+      });
+
+      newTile = {
+        idx: gridState.length,
+        player: currentPlayer,
+        row: (move === "L" || move == "R") ? movIndex : move === "D" ? 1 : 4,
+        col: (move === "D" || move == "U") ? movIndex : move === "R" ? 1 : 4
+      };
+      gridState.push(newTile);
+
+      // animate tiles
+      tileIdxToMove.push(newTile.idx);
+
+      gridState.filter(t => tileIdxToMove.indexOf(t.idx) !== -1).forEach(t => {
+        animateTile(gameTileNodes[t.idx], getGridTileFor(t.row, t.col));
+      });
+
+      currentPlayer = currentPlayer === "blue" ? 'green' : "blue";
+      updateAllowedEntries();
+    }
+  }
+
+  function animateTile(tileToMove, destTile) {
+    const totalIterations = 50;
+    const destPos = getTilePosition(destTile);
+    let currentTop = parseInt(tileToMove.style.top.replace("px", ""));
+    let currentLeft = parseInt(tileToMove.style.left.replace("px", ""));
+    const topIncrement = (destPos.top - 2.5 - currentTop) / totalIterations;
+    const leftIncrement = (destPos.left - 2.5 - currentLeft) / totalIterations;
+    const id = setInterval(animation, 10);
+    let iteration = 0;
+    function animation() {
+      if (iteration === totalIterations) {
+        clearInterval(id);
+      } else {
+        currentTop += topIncrement;
+        currentLeft += leftIncrement;
+        tileToMove.style.top = currentTop + 'px';
+        tileToMove.style.left = currentLeft + 'px';
+        iteration++;
+      }
+    }
+  }
+
+  setupEntryTileListeners();
   initGame();
-  getAllowedEntries();
 </script>
 
 </html>
