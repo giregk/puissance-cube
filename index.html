@@ -5,10 +5,67 @@
   <style>
     * {
       box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin-bottom: 100px;
+    }
+
+    h1 {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    #rules {
+      font-size: 20px;
+      margin-bottom: 5px;
+    }
+
+    #restart {
+      display: inline-block;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 25px;
+      color: white;
+      cursor: pointer;
+      margin-right: 20px;
+      background: linear-gradient(90deg, rgb(44, 83, 132), rgb(0, 171, 169));
+    }
+
+    #result {
+      font-size: 40px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    #result::before {
+      content: "";
+      display: inline-block;
+      margin-right: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 5px;
+    }
+
+    #result.green {
+      color: rgb(0, 171, 169);
+    }
+
+    #result.green::before {
+      background-color: rgb(0, 171, 169);
+    }
+
+    #result.blue {
+      color: rgb(44, 83, 132);
+    }
+
+    #result.blue::before {
+      background-color: rgb(44, 83, 132);
     }
 
     #grid {
-      background-color: grey;
+      background-color: lightgrey;
       border-radius: 5px;
       width: 425px;
       display: flex;
@@ -25,6 +82,7 @@
     }
 
     #board {
+      margin: auto;
       width: 645px;
       height: 645px;
       display: flex;
@@ -131,7 +189,12 @@
 </head>
 
 <body>
-
+  <h1>Puissance Cube</h1>
+  <div id="rules">Le premier joueur qui réussit à aligner 4 cubes a gagné.</div>
+  <div style="display:flex; align-items: center;">
+    <span id="restart">Nouvelle partie</span>
+    <span id="result"></span>
+  </div>
   <div id="board">
     <div class="tile-row">
       <div class="tile"></div>
@@ -214,7 +277,6 @@
     <div id="game-tiles">
     </div>
   </div>
-  <div id="result"></div>
 </body>
 
 <script>
@@ -258,7 +320,8 @@
 
   function initGame() {
     currentPlayer = "green";
-    resultNode.style.color = "inherit";
+    resultNode.classList.remove("blue");
+    resultNode.classList.remove("green");
     resultNode.innerText = "";
     gameTileNodes = [];
     while (gameTilesContainer.firstChild) {
@@ -272,6 +335,7 @@
     };
     gridState = [firstTile];
     addUITile(getGridTileFor(firstTile.row, firstTile.col), firstTile.player);
+    isEndOfGame();
     updateAllowedEntries();
   }
   function updateAllowedEntries() {
@@ -472,12 +536,12 @@
     }
     if (isGreenWinner) {
       resultNode.innerText = "Vert remporte la partie !";
-      resultNode.style.color = "rgb(0,171,169)";
+      resultNode.classList.add("green");
       return true;
     }
     if (isBlueWinner) {
       resultNode.innerText = "Bleu remporte la partie !";
-      resultNode.style.color = "rgb(44, 83, 132)";
+      resultNode.classList.add("blue");
       return true;
     }
 
@@ -485,11 +549,20 @@
       resultNode.innerText = "Égalité !";
       return true;
     }
+
+    resultNode.innerText = "À " + (currentPlayer === "blue" ? "bleu" : "vert") + " de jouer";
+    resultNode.classList.remove("blue");
+    resultNode.classList.remove("green");
+    resultNode.classList.add(currentPlayer);
     return false;
   }
 
   setupEntryTileListeners();
   initGame();
+
+  document.getElementById("restart").addEventListener("click", function () {
+    initGame();
+  });
 </script>
 
 </html>
