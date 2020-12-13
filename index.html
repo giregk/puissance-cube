@@ -2,24 +2,38 @@
 <html>
 
 <head>
+  <link rel="icon" href="favicon.png" />
   <style>
     * {
       box-sizing: border-box;
       font-family: Arial, Helvetica, sans-serif;
+      color: rgb(44, 83, 132);
     }
 
     body {
       margin-bottom: 100px;
     }
 
+    header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
     h1 {
       font-size: 30px;
-      margin-bottom: 10px;
+      margin-top: 0;
+      margin-bottom: 0;
+      margin-left: 20px;
     }
 
     #rules {
       font-size: 20px;
       margin-bottom: 5px;
+    }
+
+    #credits {
+      margin-top: 50px;
     }
 
     #restart {
@@ -189,7 +203,10 @@
 </head>
 
 <body>
-  <h1>Puissance Cube</h1>
+  <header>
+    <img src="logo.png" style="height: 40px;" />
+    <h1>Puissance Cube</h1>
+  </header>
   <div id="rules">Le premier joueur qui réussit à aligner 4 cubes a gagné. Pour placer un cube, vous devez en pousser un autre.</div>
   <div style="display:flex; align-items: center;">
     <span id="restart">Nouvelle partie</span>
@@ -277,6 +294,11 @@
     <div id="game-tiles">
     </div>
   </div>
+  <footer>
+
+    <div id="credits">Jeu vu dans une émission télévisée et adapté par le cofondateur d'<a target="_blank" href=" https://upsignon.eu/fr/app">UpSignOn</a>, l'application qui gère vos comptes web. </div>
+    <a href="https://upsignon.eu/fr/app" target="_blank"><img src="./UpSignOnLogo.svg" style="height: 40px;" /></a>
+  </footer>
 </body>
 
 <script>
