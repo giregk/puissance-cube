@@ -302,295 +302,295 @@
     <div id="game-tiles">
     </div>
   </div>
-</body>
 
-<script>
-  const ANIMATION_DURATION = 300;
-  const board = document.getElementById("board");
-  const gameTilesContainer = document.getElementById("game-tiles");
-  const gridTiles = document.querySelectorAll("#grid .tile");
+  <script>
+    const ANIMATION_DURATION = 300;
+    const board = document.getElementById("board");
+    const gameTilesContainer = document.getElementById("game-tiles");
+    const gridTiles = document.querySelectorAll("#grid .tile");
 
-  const D1 = document.getElementById("D1");
-  const D2 = document.getElementById("D2");
-  const D3 = document.getElementById("D3");
-  const D4 = document.getElementById("D4");
-  const L1 = document.getElementById("L1");
-  const L2 = document.getElementById("L2");
-  const L3 = document.getElementById("L3");
-  const L4 = document.getElementById("L4");
-  const U1 = document.getElementById("U1");
-  const U2 = document.getElementById("U2");
-  const U3 = document.getElementById("U3");
-  const U4 = document.getElementById("U4");
-  const R1 = document.getElementById("R1");
-  const R2 = document.getElementById("R2");
-  const R3 = document.getElementById("R3");
-  const R4 = document.getElementById("R4");
+    const D1 = document.getElementById("D1");
+    const D2 = document.getElementById("D2");
+    const D3 = document.getElementById("D3");
+    const D4 = document.getElementById("D4");
+    const L1 = document.getElementById("L1");
+    const L2 = document.getElementById("L2");
+    const L3 = document.getElementById("L3");
+    const L4 = document.getElementById("L4");
+    const U1 = document.getElementById("U1");
+    const U2 = document.getElementById("U2");
+    const U3 = document.getElementById("U3");
+    const U4 = document.getElementById("U4");
+    const R1 = document.getElementById("R1");
+    const R2 = document.getElementById("R2");
+    const R3 = document.getElementById("R3");
+    const R4 = document.getElementById("R4");
 
-  const allEntries = [D1, D2, D3, D4, L1, L2, L3, L4, U1, U2, U3, U4, R1, R2, R3, R4];
-  const resultNode = document.getElementById("result");
+    const allEntries = [D1, D2, D3, D4, L1, L2, L3, L4, U1, U2, U3, U4, R1, R2, R3, R4];
+    const resultNode = document.getElementById("result");
 
-  let gridState = [];
-  let allowedEntries = [];
-  let currentPlayer = "green";
-  let gameTileNodes = [];
+    let gridState = [];
+    let allowedEntries = [];
+    let currentPlayer = "green";
+    let gameTileNodes = [];
 
 
-  function setupEntryTileListeners() {
-    const entries = document.getElementsByClassName("entry-tile");
-    for (let i = 0; i < entries.length; i++) {
-      entries[i].addEventListener("click", playEntry);
-    }
-  };
-
-  function initGame() {
-    currentPlayer = "green";
-    resultNode.classList.remove("blue");
-    resultNode.classList.remove("green");
-    resultNode.innerText = "";
-    gameTileNodes = [];
-    while (gameTilesContainer.firstChild) {
-      gameTilesContainer.removeChild(gameTilesContainer.firstChild);
-    }
-    const firstTile = {
-      idx: 0,
-      player: "blue",
-      row: 4,
-      col: 1
+    function setupEntryTileListeners() {
+      const entries = document.getElementsByClassName("entry-tile");
+      for (let i = 0; i < entries.length; i++) {
+        entries[i].addEventListener("click", playEntry);
+      }
     };
-    gridState = [firstTile];
-    addUITile(getGridTileFor(firstTile.row, firstTile.col), firstTile.player);
-    isEndOfGame();
-    updateAllowedEntries();
-  }
-  function updateAllowedEntries() {
-    let forbiddenEntries = [];
-    if (gridState.filter(function (t) { return t.row === 1 }).length === 4) forbiddenEntries = forbiddenEntries.concat([L1, R1]);
-    if (gridState.filter(function (t) { return t.row === 2 }).length === 4) forbiddenEntries = forbiddenEntries.concat([L2, R2]);
-    if (gridState.filter(function (t) { return t.row === 3 }).length === 4) forbiddenEntries = forbiddenEntries.concat([L3, R3]);
-    if (gridState.filter(function (t) { return t.row === 4 }).length === 4) forbiddenEntries = forbiddenEntries.concat([L4, R4]);
-    if (gridState.filter(function (t) { return t.col === 1 }).length === 4) forbiddenEntries = forbiddenEntries.concat([U1, D1]);
-    if (gridState.filter(function (t) { return t.col === 2 }).length === 4) forbiddenEntries = forbiddenEntries.concat([U2, D2]);
-    if (gridState.filter(function (t) { return t.col === 3 }).length === 4) forbiddenEntries = forbiddenEntries.concat([U3, D3]);
-    if (gridState.filter(function (t) { return t.col === 4 }).length === 4) forbiddenEntries = forbiddenEntries.concat([U4, D4]);
-    allowedEntries = [];
-    gridState.forEach(function (c) {
-      if (c.row === 1) {
-        if (c.col === 1) allowedEntries.push(D1);
-        if (c.col === 2) allowedEntries.push(D2);
-        if (c.col === 3) allowedEntries.push(D3);
-        if (c.col === 4) allowedEntries.push(D4);
-      }
-      if (c.row === 4) {
-        if (c.col === 1) allowedEntries.push(U1);
-        if (c.col === 2) allowedEntries.push(U2);
-        if (c.col === 3) allowedEntries.push(U3);
-        if (c.col === 4) allowedEntries.push(U4);
-      }
-      if (c.col === 1) {
-        if (c.row === 1) allowedEntries.push(R1);
-        if (c.row === 2) allowedEntries.push(R2);
-        if (c.row === 3) allowedEntries.push(R3);
-        if (c.row === 4) allowedEntries.push(R4);
-      }
-      if (c.col === 4) {
-        if (c.row === 1) allowedEntries.push(L1);
-        if (c.row === 2) allowedEntries.push(L2);
-        if (c.row === 3) allowedEntries.push(L3);
-        if (c.row === 4) allowedEntries.push(L4);
-      }
-      allowedEntries = allowedEntries.filter(function (e) { return forbiddenEntries.indexOf(e) === -1 });
 
-      allEntries.forEach(function (e) {
-        if (allowedEntries.indexOf(e) === -1) {
-          e.classList.remove('active');
-          e.classList.remove('green');
-          e.classList.remove('blue');
-        } else {
-          e.classList.add('active');
-          e.classList.add(currentPlayer);
-        }
-      });
-    });
-  }
-
-  function getGridTileFor(row, col) {
-    return gridTiles[4 * (row - 1) + col - 1];
-  }
-
-  function getTilePosition(tile) {
-    const tileAbsPos = tile.getBoundingClientRect();
-    const boardAbsPos = board.getBoundingClientRect();
-    return {
-      top: tileAbsPos.top - boardAbsPos.top,
-      left: tileAbsPos.left - boardAbsPos.left,
+    function initGame() {
+      currentPlayer = "green";
+      resultNode.classList.remove("blue");
+      resultNode.classList.remove("green");
+      resultNode.innerText = "";
+      gameTileNodes = [];
+      while (gameTilesContainer.firstChild) {
+        gameTilesContainer.removeChild(gameTilesContainer.firstChild);
+      }
+      const firstTile = {
+        idx: 0,
+        player: "blue",
+        row: 4,
+        col: 1
+      };
+      gridState = [firstTile];
+      addUITile(getGridTileFor(firstTile.row, firstTile.col), firstTile.player);
+      isEndOfGame();
+      updateAllowedEntries();
     }
-  }
+    function updateAllowedEntries() {
+      let forbiddenEntries = [];
+      if (gridState.filter(function (t) { return t.row === 1 }).length === 4) forbiddenEntries = forbiddenEntries.concat([L1, R1]);
+      if (gridState.filter(function (t) { return t.row === 2 }).length === 4) forbiddenEntries = forbiddenEntries.concat([L2, R2]);
+      if (gridState.filter(function (t) { return t.row === 3 }).length === 4) forbiddenEntries = forbiddenEntries.concat([L3, R3]);
+      if (gridState.filter(function (t) { return t.row === 4 }).length === 4) forbiddenEntries = forbiddenEntries.concat([L4, R4]);
+      if (gridState.filter(function (t) { return t.col === 1 }).length === 4) forbiddenEntries = forbiddenEntries.concat([U1, D1]);
+      if (gridState.filter(function (t) { return t.col === 2 }).length === 4) forbiddenEntries = forbiddenEntries.concat([U2, D2]);
+      if (gridState.filter(function (t) { return t.col === 3 }).length === 4) forbiddenEntries = forbiddenEntries.concat([U3, D3]);
+      if (gridState.filter(function (t) { return t.col === 4 }).length === 4) forbiddenEntries = forbiddenEntries.concat([U4, D4]);
+      allowedEntries = [];
+      gridState.forEach(function (c) {
+        if (c.row === 1) {
+          if (c.col === 1) allowedEntries.push(D1);
+          if (c.col === 2) allowedEntries.push(D2);
+          if (c.col === 3) allowedEntries.push(D3);
+          if (c.col === 4) allowedEntries.push(D4);
+        }
+        if (c.row === 4) {
+          if (c.col === 1) allowedEntries.push(U1);
+          if (c.col === 2) allowedEntries.push(U2);
+          if (c.col === 3) allowedEntries.push(U3);
+          if (c.col === 4) allowedEntries.push(U4);
+        }
+        if (c.col === 1) {
+          if (c.row === 1) allowedEntries.push(R1);
+          if (c.row === 2) allowedEntries.push(R2);
+          if (c.row === 3) allowedEntries.push(R3);
+          if (c.row === 4) allowedEntries.push(R4);
+        }
+        if (c.col === 4) {
+          if (c.row === 1) allowedEntries.push(L1);
+          if (c.row === 2) allowedEntries.push(L2);
+          if (c.row === 3) allowedEntries.push(L3);
+          if (c.row === 4) allowedEntries.push(L4);
+        }
+        allowedEntries = allowedEntries.filter(function (e) { return forbiddenEntries.indexOf(e) === -1 });
 
-  function addUITile(targetTile, player) {
-    const newTile = document.createElement("div");
-    newTile.classList.add("tile");
-    newTile.classList.add(player);
-    newTile.style.position = "absolute";
-    const pos = getTilePosition(targetTile);
-    newTile.style.top = pos.top - 2.5 + 'px';
-    newTile.style.left = pos.left - 2.5 + 'px';
-    gameTilesContainer.appendChild(newTile);
-    gameTileNodes.push(newTile);
-  }
-
-  function playEntry(event) {
-    console.log(event.detail);
-    // prevent double clicks
-    if (!event.detail || event.detail === 1) {
-      // check if entry is authorized
-      if (allowedEntries.indexOf(event.target) !== -1) {
         allEntries.forEach(function (e) {
-          e.classList.remove('active');
-          e.classList.remove('green');
-          e.classList.remove('blue');
-        });
-        addUITile(event.target, currentPlayer);
-        const id = event.target.getAttribute("id");
-        const move = id[0];
-        const moveIndex = parseInt(id[1]);
-        const alignedTiles = gridState.filter(function (t) {
-          // keep only tiles that are aligned with the move
-          return ((move === "D" || move === "U") && moveIndex === t.col) || ((move === "L" || move === "R") && moveIndex === t.row)
-        }).sort(function (t1, t2) {
-          // order tiles
-          if (move === "D") return t1.row < t2.row ? -1 : 1;
-          if (move === "U") return t1.row < t2.row ? 1 : -1;
-          if (move === "R") return t1.col < t2.col ? -1 : 1;
-          if (move === "L") return t1.col < t2.col ? 1 : -1;
-        });
-        const tileIdxToMove = [];
-        let pushingTileIndex = 0;
-        alignedTiles.forEach(function (t) {
-          if ((move === "D" && t.row - 1 === pushingTileIndex) || (move === "U" && (5 - t.row - 1) === pushingTileIndex) || (move === "R" && t.col - 1 === pushingTileIndex) || (move === "L" && (5 - t.col - 1) === pushingTileIndex)) {
-            tileIdxToMove.push(t.idx);
-            pushingTileIndex++;
+          if (allowedEntries.indexOf(e) === -1) {
+            e.classList.remove('active');
+            e.classList.remove('green');
+            e.classList.remove('blue');
+          } else {
+            e.classList.add('active');
+            e.classList.add(currentPlayer);
           }
         });
+      });
+    }
 
-        // update tile positions
-        gridState = gridState.map(function (t) {
-          if (tileIdxToMove.indexOf(t.idx) !== -1) {
-            if (move === "D") return { idx: t.idx, col: t.col, player: t.player, row: t.row + 1 };
-            if (move === "U") return { idx: t.idx, col: t.col, player: t.player, row: t.row - 1 };
-            if (move === "L") return { idx: t.idx, row: t.row, player: t.player, col: t.col - 1 };
-            if (move === "R") return { idx: t.idx, row: t.row, player: t.player, col: t.col + 1 };
+    function getGridTileFor(row, col) {
+      return gridTiles[4 * (row - 1) + col - 1];
+    }
+
+    function getTilePosition(tile) {
+      const tileAbsPos = tile.getBoundingClientRect();
+      const boardAbsPos = board.getBoundingClientRect();
+      return {
+        top: tileAbsPos.top - boardAbsPos.top,
+        left: tileAbsPos.left - boardAbsPos.left,
+      }
+    }
+
+    function addUITile(targetTile, player) {
+      const newTile = document.createElement("div");
+      newTile.classList.add("tile");
+      newTile.classList.add(player);
+      newTile.style.position = "absolute";
+      const pos = getTilePosition(targetTile);
+      newTile.style.top = pos.top - 2.5 + 'px';
+      newTile.style.left = pos.left - 2.5 + 'px';
+      gameTilesContainer.appendChild(newTile);
+      gameTileNodes.push(newTile);
+    }
+
+    function playEntry(event) {
+      console.log(event.detail);
+      // prevent double clicks
+      if (!event.detail || event.detail === 1) {
+        // check if entry is authorized
+        if (allowedEntries.indexOf(event.target) !== -1) {
+          allEntries.forEach(function (e) {
+            e.classList.remove('active');
+            e.classList.remove('green');
+            e.classList.remove('blue');
+          });
+          addUITile(event.target, currentPlayer);
+          const id = event.target.getAttribute("id");
+          const move = id[0];
+          const moveIndex = parseInt(id[1]);
+          const alignedTiles = gridState.filter(function (t) {
+            // keep only tiles that are aligned with the move
+            return ((move === "D" || move === "U") && moveIndex === t.col) || ((move === "L" || move === "R") && moveIndex === t.row)
+          }).sort(function (t1, t2) {
+            // order tiles
+            if (move === "D") return t1.row < t2.row ? -1 : 1;
+            if (move === "U") return t1.row < t2.row ? 1 : -1;
+            if (move === "R") return t1.col < t2.col ? -1 : 1;
+            if (move === "L") return t1.col < t2.col ? 1 : -1;
+          });
+          const tileIdxToMove = [];
+          let pushingTileIndex = 0;
+          alignedTiles.forEach(function (t) {
+            if ((move === "D" && t.row - 1 === pushingTileIndex) || (move === "U" && (5 - t.row - 1) === pushingTileIndex) || (move === "R" && t.col - 1 === pushingTileIndex) || (move === "L" && (5 - t.col - 1) === pushingTileIndex)) {
+              tileIdxToMove.push(t.idx);
+              pushingTileIndex++;
+            }
+          });
+
+          // update tile positions
+          gridState = gridState.map(function (t) {
+            if (tileIdxToMove.indexOf(t.idx) !== -1) {
+              if (move === "D") return { idx: t.idx, col: t.col, player: t.player, row: t.row + 1 };
+              if (move === "U") return { idx: t.idx, col: t.col, player: t.player, row: t.row - 1 };
+              if (move === "L") return { idx: t.idx, row: t.row, player: t.player, col: t.col - 1 };
+              if (move === "R") return { idx: t.idx, row: t.row, player: t.player, col: t.col + 1 };
+            }
+            return t;
+          });
+
+          var newTile = {
+            idx: gridState.length,
+            player: currentPlayer,
+            row: (move === "L" || move == "R") ? moveIndex : move === "D" ? 1 : 4,
+            col: (move === "D" || move == "U") ? moveIndex : move === "R" ? 1 : 4
+          };
+          gridState.push(newTile);
+
+          // animate tiles
+          tileIdxToMove.push(newTile.idx);
+
+          gridState.filter(function (t) { return tileIdxToMove.indexOf(t.idx) !== -1 }).forEach(function (t) {
+            animateTile(gameTileNodes[t.idx], getGridTileFor(t.row, t.col));
+          });
+
+          currentPlayer = currentPlayer === "blue" ? 'green' : "blue";
+          if (!isEndOfGame()) {
+            setTimeout(
+              updateAllowedEntries,
+              ANIMATION_DURATION
+            )
           }
-          return t;
-        });
-
-        var newTile = {
-          idx: gridState.length,
-          player: currentPlayer,
-          row: (move === "L" || move == "R") ? moveIndex : move === "D" ? 1 : 4,
-          col: (move === "D" || move == "U") ? moveIndex : move === "R" ? 1 : 4
-        };
-        gridState.push(newTile);
-
-        // animate tiles
-        tileIdxToMove.push(newTile.idx);
-
-        gridState.filter(function (t) { return tileIdxToMove.indexOf(t.idx) !== -1 }).forEach(function (t) {
-          animateTile(gameTileNodes[t.idx], getGridTileFor(t.row, t.col));
-        });
-
-        currentPlayer = currentPlayer === "blue" ? 'green' : "blue";
-        if (!isEndOfGame()) {
-          setTimeout(
-            updateAllowedEntries,
-            ANIMATION_DURATION
-          )
         }
       }
     }
-  }
 
-  function animateTile(tileToMove, destTile) {
-    const totalIterations = ANIMATION_DURATION / 10;
-    const destPos = getTilePosition(destTile);
-    let currentTop = parseInt(tileToMove.style.top.replace("px", ""));
-    let currentLeft = parseInt(tileToMove.style.left.replace("px", ""));
-    const topIncrement = (destPos.top - 2.5 - currentTop) / totalIterations;
-    const leftIncrement = (destPos.left - 2.5 - currentLeft) / totalIterations;
-    const id = setInterval(animation, 10);
-    let iteration = 0;
-    function animation() {
-      if (iteration === totalIterations) {
-        clearInterval(id);
-      } else {
-        currentTop += topIncrement;
-        currentLeft += leftIncrement;
-        tileToMove.style.top = currentTop + 'px';
-        tileToMove.style.left = currentLeft + 'px';
-        iteration++;
+    function animateTile(tileToMove, destTile) {
+      const totalIterations = ANIMATION_DURATION / 10;
+      const destPos = getTilePosition(destTile);
+      let currentTop = parseInt(tileToMove.style.top.replace("px", ""));
+      let currentLeft = parseInt(tileToMove.style.left.replace("px", ""));
+      const topIncrement = (destPos.top - 2.5 - currentTop) / totalIterations;
+      const leftIncrement = (destPos.left - 2.5 - currentLeft) / totalIterations;
+      const id = setInterval(animation, 10);
+      let iteration = 0;
+      function animation() {
+        if (iteration === totalIterations) {
+          clearInterval(id);
+        } else {
+          currentTop += topIncrement;
+          currentLeft += leftIncrement;
+          tileToMove.style.top = currentTop + 'px';
+          tileToMove.style.left = currentLeft + 'px';
+          iteration++;
+        }
       }
     }
-  }
 
-  function isEndOfGame() {
-    let isGreenWinner = false;
-    let isBlueWinner = false;
+    function isEndOfGame() {
+      let isGreenWinner = false;
+      let isBlueWinner = false;
 
-    if (gridState.filter(function (t) { return t.row === 1 && t.player === "green" }).length === 4) isGreenWinner = true;
-    if (gridState.filter(function (t) { return t.row === 2 && t.player === "green" }).length === 4) isGreenWinner = true;
-    if (gridState.filter(function (t) { return t.row === 3 && t.player === "green" }).length === 4) isGreenWinner = true;
-    if (gridState.filter(function (t) { return t.row === 4 && t.player === "green" }).length === 4) isGreenWinner = true;
-    if (gridState.filter(function (t) { return t.col === 1 && t.player === "green" }).length === 4) isGreenWinner = true;
-    if (gridState.filter(function (t) { return t.col === 2 && t.player === "green" }).length === 4) isGreenWinner = true;
-    if (gridState.filter(function (t) { return t.col === 3 && t.player === "green" }).length === 4) isGreenWinner = true;
-    if (gridState.filter(function (t) { return t.col === 4 && t.player === "green" }).length === 4) isGreenWinner = true;
-    if (gridState.filter(function (t) { return t.col === t.row && t.player === "green" }).length === 4) isGreenWinner = true;
-    if (gridState.filter(function (t) { return t.col === 5 - t.row && t.player === "green" }).length === 4) isGreenWinner = true;
+      if (gridState.filter(function (t) { return t.row === 1 && t.player === "green" }).length === 4) isGreenWinner = true;
+      if (gridState.filter(function (t) { return t.row === 2 && t.player === "green" }).length === 4) isGreenWinner = true;
+      if (gridState.filter(function (t) { return t.row === 3 && t.player === "green" }).length === 4) isGreenWinner = true;
+      if (gridState.filter(function (t) { return t.row === 4 && t.player === "green" }).length === 4) isGreenWinner = true;
+      if (gridState.filter(function (t) { return t.col === 1 && t.player === "green" }).length === 4) isGreenWinner = true;
+      if (gridState.filter(function (t) { return t.col === 2 && t.player === "green" }).length === 4) isGreenWinner = true;
+      if (gridState.filter(function (t) { return t.col === 3 && t.player === "green" }).length === 4) isGreenWinner = true;
+      if (gridState.filter(function (t) { return t.col === 4 && t.player === "green" }).length === 4) isGreenWinner = true;
+      if (gridState.filter(function (t) { return t.col === t.row && t.player === "green" }).length === 4) isGreenWinner = true;
+      if (gridState.filter(function (t) { return t.col === 5 - t.row && t.player === "green" }).length === 4) isGreenWinner = true;
 
-    if (gridState.filter(function (t) { return t.row === 1 && t.player === "blue" }).length === 4) isBlueWinner = true;
-    if (gridState.filter(function (t) { return t.row === 2 && t.player === "blue" }).length === 4) isBlueWinner = true;
-    if (gridState.filter(function (t) { return t.row === 3 && t.player === "blue" }).length === 4) isBlueWinner = true;
-    if (gridState.filter(function (t) { return t.row === 4 && t.player === "blue" }).length === 4) isBlueWinner = true;
-    if (gridState.filter(function (t) { return t.col === 1 && t.player === "blue" }).length === 4) isBlueWinner = true;
-    if (gridState.filter(function (t) { return t.col === 2 && t.player === "blue" }).length === 4) isBlueWinner = true;
-    if (gridState.filter(function (t) { return t.col === 3 && t.player === "blue" }).length === 4) isBlueWinner = true;
-    if (gridState.filter(function (t) { return t.col === 4 && t.player === "blue" }).length === 4) isBlueWinner = true;
-    if (gridState.filter(function (t) { return t.col === t.row && t.player === "blue" }).length === 4) isBlueWinner = true;
-    if (gridState.filter(function (t) { return t.col === 5 - t.row && t.player === "blue" }).length === 4) isBlueWinner = true;
+      if (gridState.filter(function (t) { return t.row === 1 && t.player === "blue" }).length === 4) isBlueWinner = true;
+      if (gridState.filter(function (t) { return t.row === 2 && t.player === "blue" }).length === 4) isBlueWinner = true;
+      if (gridState.filter(function (t) { return t.row === 3 && t.player === "blue" }).length === 4) isBlueWinner = true;
+      if (gridState.filter(function (t) { return t.row === 4 && t.player === "blue" }).length === 4) isBlueWinner = true;
+      if (gridState.filter(function (t) { return t.col === 1 && t.player === "blue" }).length === 4) isBlueWinner = true;
+      if (gridState.filter(function (t) { return t.col === 2 && t.player === "blue" }).length === 4) isBlueWinner = true;
+      if (gridState.filter(function (t) { return t.col === 3 && t.player === "blue" }).length === 4) isBlueWinner = true;
+      if (gridState.filter(function (t) { return t.col === 4 && t.player === "blue" }).length === 4) isBlueWinner = true;
+      if (gridState.filter(function (t) { return t.col === t.row && t.player === "blue" }).length === 4) isBlueWinner = true;
+      if (gridState.filter(function (t) { return t.col === 5 - t.row && t.player === "blue" }).length === 4) isBlueWinner = true;
 
-    if (isBlueWinner && isGreenWinner) {
-      resultNode.innerText = "Égalité !";
-      return true;
+      if (isBlueWinner && isGreenWinner) {
+        resultNode.innerText = "Égalité !";
+        return true;
+      }
+      if (isGreenWinner) {
+        resultNode.innerText = "Vert remporte la partie !";
+        resultNode.classList.add("green");
+        return true;
+      }
+      if (isBlueWinner) {
+        resultNode.innerText = "Bleu remporte la partie !";
+        resultNode.classList.add("blue");
+        return true;
+      }
+
+      if (gridState.length === 16) {
+        resultNode.innerText = "Égalité !";
+        return true;
+      }
+
+      resultNode.innerText = "À " + (currentPlayer === "blue" ? "bleu" : "vert") + " de jouer";
+      resultNode.classList.remove("blue");
+      resultNode.classList.remove("green");
+      resultNode.classList.add(currentPlayer);
+      return false;
     }
-    if (isGreenWinner) {
-      resultNode.innerText = "Vert remporte la partie !";
-      resultNode.classList.add("green");
-      return true;
-    }
-    if (isBlueWinner) {
-      resultNode.innerText = "Bleu remporte la partie !";
-      resultNode.classList.add("blue");
-      return true;
-    }
 
-    if (gridState.length === 16) {
-      resultNode.innerText = "Égalité !";
-      return true;
-    }
-
-    resultNode.innerText = "À " + (currentPlayer === "blue" ? "bleu" : "vert") + " de jouer";
-    resultNode.classList.remove("blue");
-    resultNode.classList.remove("green");
-    resultNode.classList.add(currentPlayer);
-    return false;
-  }
-
-  setupEntryTileListeners();
-  initGame();
-
-  document.getElementById("restart").addEventListener("click", function () {
+    setupEntryTileListeners();
     initGame();
-  });
-</script>
+
+    document.getElementById("restart").addEventListener("click", function () {
+      initGame();
+    });
+  </script>
+</body>
 
 </html>
